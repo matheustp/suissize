@@ -1,0 +1,71 @@
+{
+  "name": "suissize",
+  "displayName": "suissize",
+  "description": "Format code to Suissa's style",
+  "version": "0.0.1",
+  "publisher": "matheustp",
+  "engines": {
+    "vscode": "^1.13.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:suissize.formatLine",
+    "onCommand:suissize.formatCode",
+    "onCommand:suissize.formatIndentCode"
+  ],
+  "main": "./extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "suissize.formatLine",
+        "title": "Suissize line"
+      },
+      {
+        "command": "suissize.formatCode",
+        "title": "Suissize code"
+      },
+      {
+        "command": "suissize.formatIndentCode",
+        "title": "Suissize and indent code"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "suissize.formatLine",
+        "key": "shift+enter",
+        "mac": "shift+enter",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "suissize.formatCode",
+        "key": "alt+enter",
+        "mac": "alt+enter",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "suissize.formatIndentCode",
+        "key": "alt+shift+enter",
+        "mac": "alt+shift+enter",
+        "when": "editorTextFocus"
+      }
+    ]
+  },
+  "scripts": {
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "typescript": "^2.0.3",
+    "vscode": "^1.0.0",
+    "mocha": "^2.3.3",
+    "eslint": "^3.6.0",
+    "@types/node": "^6.0.40",
+    "@types/mocha": "^2.2.32"
+  },
+  "dependencies": {
+    "standard": "^10.0.2",
+    "standard-format": "^2.2.4"
+  }
+}
