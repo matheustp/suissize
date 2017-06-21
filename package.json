@@ -4,12 +4,33 @@
   "description": "Format code to Suissa's style",
   "version": "0.0.1",
   "publisher": "matheustp",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.13.0"
   },
+  "homepage": "https://github.com/matheustp/suissize",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/matheustp/suissize"
+  },
+  "bugs": {
+    "url": "https://github.com/matheustp/suissize/issues"
+  },
   "categories": [
-    "Other"
+    "Other",
+    "Snippets"
   ],
+  "keywords": [
+    "suissa",
+    "format",
+    "production",
+    "speed"
+  ],
+  "icon": "images/suissize.png",
+  "galleryBanner": {
+    "color": "#8BC34A",
+    "theme": "dark"
+  },
   "activationEvents": [
     "onCommand:suissize.formatLine",
     "onCommand:suissize.formatCode",
@@ -65,7 +86,6 @@
     "@types/mocha": "^2.2.32"
   },
   "dependencies": {
-    "standard": "^10.0.2",
     "standard-format": "^2.2.4"
   }
 }
