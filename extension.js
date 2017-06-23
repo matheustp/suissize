@@ -1,134 +1,153 @@
 'use strict'
-const vscode = require('vscode')
-const standardFormat = require('standard-format')
+const vscode = require( 'vscode' )
+const standardFormat = require( 'standard-format' )
 
-const replaceParenthesis = (text) => {
-  const regexOpeningParenthesis = /(\()(\b|\(|\'|\`|\"|\{|\[)/g
-  const regexClosingParenthesis = /(\b|\)|\'|\`|\"|\}|\])(\))/g
-  const fixNestedOpeningParenthesis = /(\()(\()/g
-  const fixNestedClosingParenthesis = /(\))(\))/g
-  return text.replace(regexOpeningParenthesis, `$1 $2`)
-    .replace(regexClosingParenthesis, `$1 $2`)
-    .replace(fixNestedClosingParenthesis, `$1 $2`)
-    .replace(fixNestedOpeningParenthesis, `$1 $2`)
-}
-
-const replaceCurlyBrackets = (text) => {
-  const regexOpeningCurlyBrackets = /(\{)(\b|\(|\'|\`|\"|\{|\[)/g
-  const regexClosingCurlyBrackets = /(\b|\)|\'|\`|\"|\}|\])(\})/g
-  const fixNestedOpeningCurlyBrackets = /(\{)(\{)/g
-  const fixNestedClosingCurlyBrackets = /(\})(\})/g
-  return text.replace(regexOpeningCurlyBrackets, `$1 $2`)
-    .replace(regexClosingCurlyBrackets, `$1 $2`)
-    .replace(fixNestedClosingCurlyBrackets, `$1 $2`)
-    .replace(fixNestedOpeningCurlyBrackets, `$1 $2`)
-}
-
-const replaceSquareBrackets = (text) => {
-  const regexOpeningSquareBrackets = /(\[)(\b|\(|\'|\`|\"|\{|\[)/g
-  const regexClosingSquareBrackets = /(\b|\)|\'|\`|\"|\}|\])(\])/g
-  const fixNestedOpeningSquareBrackets = /(\[)(\[)/g
-  const fixNestedClosingSquareBrackets = /(\])(\])/g
-  return text.replace(regexOpeningSquareBrackets, `$1 $2`)
-  .replace(regexClosingSquareBrackets, `$1 $2`)
-  .replace(fixNestedClosingSquareBrackets, `$1 $2`)
-  .replace(fixNestedOpeningSquareBrackets, `$1 $2`)
-}
-
-const replaceEqualSymbol = (text) => {
+const replaceEqualSymbol = ( text ) => {
   const regexAfterEqual = /\=(\>?)(\b|\[|\(|\{)/g
   const regexBeforeEqual = /(\b|\]|\)|\})\=/g
-  return text.replace(regexAfterEqual, `=$1 $2`).replace(regexBeforeEqual, `$1 =`)
+  return text.replace( regexAfterEqual, `=$1 $2` ).replace( regexBeforeEqual, `$1 =` )
 }
 
-const replaceFunction = (text) => {
+const replaceFunction = ( text ) => {
   const regexAfterFunction = /function(\w|\()/g
   const regexAfterFunctionName = /function (\w+|\()(\()/g
-  return text.replace(regexAfterFunction, `function $1`).replace(regexAfterFunctionName, `function $1 $2`)
+  return text.replace( regexAfterFunction, `function $1` ).replace( regexAfterFunctionName, `function $1 $2` )
 }
 
-const replaceComma = (text) => {
-  const regexComma = /\,(\b|\(|\{|\[|\'|\"|\`)/g
-  return text.replace(regexComma, `, $1`);
+const replaceCommaAndColon = ( text ) => {
+  const regexCommaAndColon = /(\:|\,)(\b|\(|\{|\[|\'|\"|\`)/g
+  return text.replace( regexCommaAndColon, `$1 $2` )
 }
 
-const replaceColon = (text) => {
-  const regexColon = /\:(\b|\(|\{|\[|\'|\"|\`)/g
-  return text.replace(regexColon, `: $1`);
+const replaceParenthesisAndBrackets = ( text ) => {
+  const regexOpeningParenthesisAndBrackets = /(\{|\(|\[)(\b|\(|\'|\`|\"|\{|\[)/g
+  const regexClosingParenthesisAndBrackets = /(\b|\)|\'|\`|\"|\}|\])(\}|\]|\))/g
+  const fixNestedOpeningParenthesisAndBrackets = /(\{|\(|\[)(\{|\(|\[)/g
+  const fixNestedClosingParenthesisAndBrackets = /(\}|\]|\))(\}|\]|\))/g
+  return text.replace( fixNestedClosingParenthesisAndBrackets, `$1 $2` )
+    .replace( fixNestedOpeningParenthesisAndBrackets, `$1 $2` )
+    .replace( regexOpeningParenthesisAndBrackets, `$1 $2` )
+    .replace( regexClosingParenthesisAndBrackets, `$1 $2` )
+    
 }
 
-function suissize(option) {
-  let editor = vscode.window.activeTextEditor
-  if (!editor) return
+const removeSemiColon = ( text ) => {
+  const regexSemiColon = /(;)(\n)/g
+  return text.replace( regexSemiColon, `$2` )
+}
 
-  vscode.commands.executeCommand('acceptSelectedSuggestion').then(() => {
+const removeMultiLine = ( text ) => {
+  const regexMultiLine = /(.)(\n\n)(\n)+/g
+  return text.replace( regexMultiLine, `$1$2` )
+}
+
+const replaceInfix = ( text ) => {
+  const regexInfixQuotesLeft = /((\"|\'|\`)[a-zA-Z0-9\+\-\%\/\*\s]+(\"|\'|\`))(\+)/g
+  const regexInfixQuotesRight = /(\+)((\"|\'|\`)[a-zA-Z0-9\+\-\%\/\*\s]+(\"|\'|\`))/g
+  const regexInfixLeft = /(\S+)(\+|\-|\/|\*|\%)/g
+  const regexInfixRight = /(\+|\-|\/|\*|\%)(\S+)/g
+  return text.replace( regexInfixQuotesLeft, `$1 $4` )
+  .replace( regexInfixQuotesRight, `$1 $2` )
+  .replace( regexInfixLeft, (str, p1, p2) => {
+    if (str.indexOf("'") != -1 || str.indexOf("\"") != -1 || str.indexOf("`") != -1 || p1.charAt(p1.length-1) === p2)
+      return str
+    return p1+" "+p2
+  }).replace(regexInfixRight, (str, p1, p2) => {
+    if (str.indexOf("'") != -1 || str.indexOf("\"") != -1 || str.indexOf("`") != -1 || p1.charAt(p1.length-1) === p2)
+      return str
+    return p1+" "+p2})
+}
+
+function suissize ( option ) {
+  const editor = vscode.window.activeTextEditor
+  if (!editor ) return
+
+  vscode.commands.executeCommand( 'acceptSelectedSuggestion' ).then( () => {
     let range
     let currentText
-    if (option === 'formatLine') {
-      let lineIndex = editor.selection.active.line
-      let lineObject = editor.document.lineAt(lineIndex)
-      let lineLength = lineObject.text.length
-      let start = new vscode.Position(lineIndex, 0)
-      let end = new vscode.Position(lineIndex, lineLength)
-      range = new vscode.Range(start, end)
+    if ( option === 'formatLine' ) {
+      const lineIndex = editor.selection.active.line
+      const lineObject = editor.document.lineAt( lineIndex )
+      const lineLength = lineObject.text.length
+      const start = new vscode.Position( lineIndex, 0 )
+      const end = new vscode.Position( lineIndex, lineLength )
+      range = new vscode.Range( start, end )
       currentText = lineObject.text
     } else {
-      let document = editor.document
-      let start = new vscode.Position(0, 0)
-      let end = new vscode.Position(document.lineCount - 1, document.lineAt(document.lineCount - 1).text.length)
-      range = new vscode.Range(start, end)
-      currentText = editor.document.getText(range)
+      const document = editor.document
+      const start = new vscode.Position( 0, 0 )
+      const end = new vscode.Position( document.lineCount - 1,
+        document.lineAt( document.lineCount - 1 ).text.length )
+      range = new vscode.Range( start, end )
+      currentText = editor.document.getText( range )
     }
 
-    //let currentText = editor.document.getText(range)
-    //console.log("line " + lineObject.text)
-    //console.log("full text" + currentText)
     let options = vscode.FormattingOptions
-    if (!options) {
+    if (!options ) {
       options = { insertSpaces: true, tabSize: 2 }
     }
-
-    if (!currentText.isEmptyOrWhitespace) {
-      let insertionSuccess = editor.edit((editBuilder) => {
-        let formatted;
-        if (option === 'formatIndentCode') {
+    let regexArray;
+    if (!currentText.isEmptyOrWhitespace ) {
+      let insertionSuccess = editor.edit( (editBuilder ) => {
+        let formatted
+        if ( option === 'formatIndentCode' ) {
           try {
-            formatted = standardFormat.transform(currentText)
-          } catch (err) {
-            vscode.window.showErrorMessage(err.message)
+            formatted = standardFormat.transform( currentText )
+          } catch ( err ) {
+            vscode.window.showErrorMessage( err.message )
             return
           }
-          formatted = replaceParenthesis(replaceSquareBrackets(replaceCurlyBrackets(formatted)))
+          regexArray = formatted.match(/\/.*\/\s?\w*/g)
+          formatted = replaceParenthesisAndBrackets( formatted )
         } else {
-          formatted = replaceParenthesis(replaceSquareBrackets(replaceCurlyBrackets(replaceComma(replaceColon(replaceFunction(replaceEqualSymbol(currentText)))))))
+          regexArray = currentText.match(/\/.*\/\s?\w*/g)
+          formatted = removeMultiLine(
+            replaceParenthesisAndBrackets(
+              replaceCommaAndColon(
+                removeSemiColon(
+                  replaceInfix(
+                    replaceFunction(
+                      replaceEqualSymbol( currentText )
+                    )
+                  )
+                )
+              )
+            )
+          )          
         }
-        editBuilder.replace(range, formatted)
-      })
+        if(regexArray != null && regexArray.length > 0) {
+        let positionArray = 0
+        formatted = formatted.replace(/\/.*\/\s?\w*/g, (str) => {
+          positionArray++
+          return regexArray[positionArray-1]
+        })
+        }
+        editBuilder.replace( range, formatted )
+      } )
 
-      if (!insertionSuccess) return
+      if (!insertionSuccess ) return
     }
 
-    if (option === 'formatLine') return vscode.commands.executeCommand('editor.action.insertLineAfter')
-
-  })
+    if ( option === 'formatLine' ) return vscode.commands.executeCommand( 'editor.action.insertLineAfter' )
+  } )
 }
 
-function activate(context) {
-  let formatLine = vscode.commands.registerCommand('suissize.formatLine', () => {
-    suissize('formatLine')
-  })
+function activate ( context ) {
+  const formatLine = vscode.commands.registerCommand( 'suissize.formatLine', () => {
+    suissize( 'formatLine' )
+  } )
 
-  let formatCode = vscode.commands.registerCommand('suissize.formatCode', () => {
-    suissize('formatCode')
-  })
+  const formatCode = vscode.commands.registerCommand( 'suissize.formatCode', () => {
+    suissize( 'formatCode' )
+  } )
 
-  let formatIndentCode = vscode.commands.registerCommand('suissize.formatIndentCode', () => {
-    suissize('formatIndentCode')
-  })
+  const formatIndentCode = vscode.commands.registerCommand( 'suissize.formatIndentCode', () => {
+    suissize( 'formatIndentCode' )
+  } )
 
-  context.subscriptions.push(formatLine)
-  context.subscriptions.push(formatCode)
-  context.subscriptions.push(formatIndentCode)
+  context.subscriptions.push( formatLine )
+  context.subscriptions.push( formatCode )
+  context.subscriptions.push( formatIndentCode )
 }
 
 exports.activate = activate
