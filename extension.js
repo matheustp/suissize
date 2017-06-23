@@ -28,7 +28,6 @@ const replaceParenthesisAndBrackets = ( text ) => {
     .replace( fixNestedOpeningParenthesisAndBrackets, `$1 $2` )
     .replace( regexOpeningParenthesisAndBrackets, `$1 $2` )
     .replace( regexClosingParenthesisAndBrackets, `$1 $2` )
-    
 }
 
 const removeSemiColon = ( text ) => {
@@ -47,15 +46,15 @@ const replaceInfix = ( text ) => {
   const regexInfixLeft = /(\S+)(\+|\-|\/|\*|\%)/g
   const regexInfixRight = /(\+|\-|\/|\*|\%)(\S+)/g
   return text.replace( regexInfixQuotesLeft, `$1 $4` )
-  .replace( regexInfixQuotesRight, `$1 $2` )
-  .replace( regexInfixLeft, (str, p1, p2) => {
-    if (str.indexOf("'") != -1 || str.indexOf("\"") != -1 || str.indexOf("`") != -1 || p1.charAt(p1.length-1) === p2)
+    .replace( regexInfixQuotesRight, `$1 $2` )
+    .replace( regexInfixLeft, ( str, p1, p2 ) => {
+      if ( str.indexOf( "'" ) != -1 || str.indexOf( '"' ) != -1 || str.indexOf( '`' ) != -1 || p1.charAt( p1.length - 1 ) === p2 )
+        return str
+      return p1 + ' ' + p2
+    } ).replace( regexInfixRight, ( str, p1, p2 ) => {
+    if ( str.indexOf( "'" ) != -1 || str.indexOf( '"' ) != -1 || str.indexOf( '`' ) != -1 || p1.charAt( p1.length - 1 ) === p2 )
       return str
-    return p1+" "+p2
-  }).replace(regexInfixRight, (str, p1, p2) => {
-    if (str.indexOf("'") != -1 || str.indexOf("\"") != -1 || str.indexOf("`") != -1 || p1.charAt(p1.length-1) === p2)
-      return str
-    return p1+" "+p2})
+    return p1 + ' ' + p2 } )
 }
 
 function suissize ( option ) {
@@ -86,9 +85,9 @@ function suissize ( option ) {
     if (!options ) {
       options = { insertSpaces: true, tabSize: 2 }
     }
-    let regexArray;
+    let regexArray
     if (!currentText.isEmptyOrWhitespace ) {
-      let insertionSuccess = editor.edit( (editBuilder ) => {
+      let insertionSuccess = editor.edit( ( editBuilder ) => {
         let formatted
         if ( option === 'formatIndentCode' ) {
           try {
@@ -97,10 +96,10 @@ function suissize ( option ) {
             vscode.window.showErrorMessage( err.message )
             return
           }
-          regexArray = formatted.match(/\/.*\/\s?\w*/g)
+          regexArray = formatted.match(/\/.*\/\s?\w*/g )
           formatted = replaceParenthesisAndBrackets( formatted )
         } else {
-          regexArray = currentText.match(/\/.*\/\s?\w*/g)
+          regexArray = currentText.match(/\/.*\/\s?\w*/g )
           formatted = removeMultiLine(
             replaceParenthesisAndBrackets(
               replaceCommaAndColon(
@@ -113,14 +112,14 @@ function suissize ( option ) {
                 )
               )
             )
-          )          
+          )
         }
-        if(regexArray != null && regexArray.length > 0) {
-        let positionArray = 0
-        formatted = formatted.replace(/\/.*\/\s?\w*/g, (str) => {
-          positionArray++
-          return regexArray[positionArray-1]
-        })
+        if ( regexArray != null && regexArray.length > 0 ) {
+          let positionArray = 0
+          formatted = formatted.replace(/\/.*\/\s?\w*/g, ( str ) => {
+            positionArray++
+            return regexArray[ positionArray - 1 ]
+          } )
         }
         editBuilder.replace( range, formatted )
       } )
