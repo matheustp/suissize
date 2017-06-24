@@ -2,7 +2,7 @@
   "name": "suissize",
   "displayName": "suissize",
   "description": "Format code to Suissa's style",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "matheustp",
   "license": "MIT",
   "engines": {
@@ -32,21 +32,11 @@
     "theme": "dark"
   },
   "activationEvents": [
-    "onCommand:suissize.formatLine",
-    "onCommand:suissize.formatCode",
     "onCommand:suissize.formatIndentCode"
   ],
   "main": "./extension",
   "contributes": {
     "commands": [
-      {
-        "command": "suissize.formatLine",
-        "title": "Suissize line"
-      },
-      {
-        "command": "suissize.formatCode",
-        "title": "Suissize code"
-      },
       {
         "command": "suissize.formatIndentCode",
         "title": "Suissize and indent code"
@@ -54,21 +44,9 @@
     ],
     "keybindings": [
       {
-        "command": "suissize.formatLine",
-        "key": "shift+enter",
-        "mac": "shift+enter",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "suissize.formatCode",
+        "command": "suissize.formatIndentCode",
         "key": "alt+enter",
         "mac": "alt+enter",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "suissize.formatIndentCode",
-        "key": "alt+shift+enter",
-        "mac": "alt+shift+enter",
         "when": "editorTextFocus"
       }
     ]
@@ -86,6 +64,7 @@
     "@types/mocha": "^2.2.32"
   },
   "dependencies": {
+    "import": "0.0.6",
     "standard-format": "^2.2.4"
   }
 }
