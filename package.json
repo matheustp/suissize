@@ -2,7 +2,7 @@
   "name": "suissize",
   "displayName": "suissize",
   "description": "Format code to Suissa's style",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "publisher": "matheustp",
   "license": "MIT",
   "engines": {
